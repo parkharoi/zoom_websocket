@@ -2,6 +2,7 @@ import http from "http";
 import WebSocket from "ws";
 import express from "express";
 import { Socket } from "dgram";
+import { SocketAddress } from "net";
 
 const app = express();
 
@@ -16,13 +17,18 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+const sockets = [];
+
 wss.on("connection", (socket) => {
+  //누군가 우리 서버에 연결하면, 그 connection을 여기에 넣을거야
+  // 이 뜻은 firefox가 연결될 떄, firefox를 이 array에 넣어 준다.
+  sockets.push(socket);
   console.log("Connected to Browser ✅");
   socket.on("close", () => console.log("Disconected the Browser ⛔️"));
   socket.on("message", (message) => {
-    console.log(message.toString(`utf8`));
+    sockets.forEach((aSocket) => aSocket.send(message).toString());
+    // 각 브라우저를 aSocket으로 표시하고 메시지를 보낸다는 의미 이제 연결된 모든 소켓 연결
   });
-  socket.send("hello !!");
 });
 //connection이 생기면 socket을 받는다
 //서버 socket에서 hello 보내줌
