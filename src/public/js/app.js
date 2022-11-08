@@ -33,6 +33,9 @@ function handleSubmit(event) {
   const input = messageForm.querySelector("input");
   socket.send(makeMessage("new_message", input.value));
   //front-end의 form에서 back-end로 무엇가를 보냄
+  const li = document.createElement("li");
+  li.innerText = `You: ${input.value}`;
+  messageList.append(li);
   input.value = "";
   // 입력 다 하면 빈값으로 만들어줌
 }
