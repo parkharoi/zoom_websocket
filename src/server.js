@@ -15,20 +15,35 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on("connection", (socket) => {
+  socket["nickname"] = "Anon";
   socket.onAny((event) => {
     console.log(`Socket Event:${event}`);
+    //Socket Event:enter_room
   });
+
   socket.on("enter_room", (roomName, done) => {
     socket.join(roomName);
-    // socketIO에서 모든 socket은 기본적으로 User와 서버 사이에 private romm이 있다.
-    //이게 방에 참가하는 기능임
-    setTimeout(() => {
-      done("hello from the backend");
-    }, 15000);
-    //백에서 함수 done 함수 실행시킴
+    //방에 입장해서 프론트엔드에게 알렸고
+    done();
+    socket.to(roomName).emit("welcome", socket.nickname);
+    //"welcome" event를 rommName에 있는 모든 사람들에게 emit함
   });
+
+  socket.on("disconnecting", () => {
+    //클라이언트가 서버와 연결이 끊어지기 전에 마지막 "굿바이" message 보내는거임
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
+  });
+
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", `${socket.nickname} : ${msg}`);
+    done();
+  });
+
+  socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
+  //여기서 닉네임을 받고 nickname event가 발생하면 nickname을 가져와서 socket에 저장
 });
-//conection을 받을 준비
 
 // const wss = new WebSocket.Server({ server });
 
