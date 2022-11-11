@@ -26,6 +26,41 @@ ex) back-end로 javasctipt object를 보내면 좋지 않다.
 
 ### 1.
 
+- 우리가 on 하고 백엔드가 emit 하는거 같음
+
+### 클라이언트 -> 서버
+
+(클라이언트가 서버에게 전송한 메시지 수신)
+
+on 메소드
+: 현재 접속되어 있는 클라이언트로부터 메시지를 수신하려면 on 메소드 사용
+io.on('connection', function(socket) {
+
+});
+
+socket.on('event_name', function(data) {
+console.log('Message from Client: ' + data);
+});
+
+'connection'
+: socket.io의 기본 이벤트, 사용자가 웹사이트에 접속하면 자동으로 발생하는 이벤트
+
+### 서버 -> 클라이언트
+
+(서버가 클라이언트에게 메시지 전송)
+
+io.emit
+:서버가 현재 접속해있는 모든 클라이언트에게 이벤트 전달
+
+io.emit('event_name', msg);
+
+socket.emit
+:서버쪽에서 event를 발생시키는 함수
+서버에서 이벤트 발생시키면 클라이언트 페이지의 해당 이벤트 리스너에서 처리
+해당 소켓을 통해 클라이언트에게 메시지 전송
+
+socket.emit('event_name', msg);
+
 소켓은 기본적으로 객체다.
 
 socket IO는 실시간, 양방향, event 기반의 통신을 가능하게 한다.
@@ -52,8 +87,38 @@ WebSocket()
 
 백엔드에서 socket은 연결된 어떤 사람이다. 연결된 브라우저와의 contact(연락)라인 브라우저와 너의 연결
 
+### part2
+
 한개의 서버가 서로 다른 두 브라우저로 부터 메시지를 받고 있고, 그 메시지에 각각 답장해주고 있지만, 서로 다른 브라우저는 서로 메시지를 주고받지 못합니다.
 
 만약 끝날 때 실행되는 argument(매개변수)는 function을 보내고 싶으면 마지막에 넣얻야돼
 Back-end는 front-end에서 오는 코드를 실행시키면 안돼 엉청난 보안 문제가 생겨서
 사람들이 아무코드나 입력하면 백이 실행시켜서
+
+Disconnecting은 고객이 접속을 중단할 것이지만 아직 방을 완전히 나가지는 않은 것이다.
+disconnect와 다르다.
+
+2-8
+adapter는 누가 연결 되었는지, 현재 어플리케이션에 room이 얼마나 있는 지 알려줌
+중요한거 두가지
+
+1. 어플리케이션에 있는 rooms이다. //우리는 어플리케이션에 있는 모든 rooms를 볼 수 있다.
+2. 우리는 socketID 를 볼 수 있다.
+
+- rooms.forEach((value, key) => console.log(value, key))
+  true "R98ps0fmEt3D"
+  true "3kdsjkd3ksjl
+  true "nana"
+- 우리는 value 값이 아니라 key 값이 필요하다는 것을 알 수 있어
+  무언가를 얻고 싶다면 get이랑 key를 사용하면 된다.
+
+- rooms. forEach((\_, key) => {
+  if(sids.get(key) === undifined)
+  }
+  만약 내가 key를 가지고 socket ID를 가지려고 하고 그 값이 undefined라면
+  내 key는 public room의 key라는 뜻이다.
+  모든 socket은 private room이 있다는걸 기억해라 그건 바로 id가 방제목인 경우이다.
+  그래서 우리가 private message를 보낼 수 있음
+
+socket io 패키지 설치
+socket i socket.io
